@@ -1,3 +1,7 @@
+/**
+ * Implementation of the CustomerDAO interface for accessing and managing customer data in the database.
+ * Provides methods to perform CRUD (Create, Read, Update, Delete) operations specific to customers.
+ */
 package org.music.application.database.management.customer;
 
 import java.sql.Connection;
@@ -8,6 +12,13 @@ import java.util.List;
 
 public class CustomerDAOImplementation implements CustomerDAO {
     // CRUD - Retrieve
+    /**
+     * Retrieves a customer from the database based on the provided customer ID.
+     *
+     * @param id The unique identifier of the customer to retrieve.
+     * @return The retrieved customer object.
+     * @throws SQLException If an SQL exception occurs while accessing the database.
+     */
     @Override
     public Customer get(int id) throws SQLException {
         Connection conn = Database.getConnection();

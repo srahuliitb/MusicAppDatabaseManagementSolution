@@ -40,3 +40,4 @@ build/
 ### src ###
 /Users/rahulmacair/IdeaProjects/MusicAppDatabaseManagementSolution/src/main/java/org/music/application/database/management/customer/
 Database.java
+CheckDatabaseConnection.java
