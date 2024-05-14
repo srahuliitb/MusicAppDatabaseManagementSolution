@@ -16,40 +16,23 @@ public class CustomerDAOImplementation implements CustomerDAO {
     /**
      * Retrieves a customer from the database based on the provided customer ID.
      *
-     * @param id The unique identifier of the customer to retrieve.
+     * @param customerId The unique identifier of the customer to retrieve.
      * @return The retrieved customer object.
      * @throws SQLException If an SQL exception occurs while accessing the database.
      */
     @Override
-    public Customer get(int id) throws SQLException {
-        Connection conn = Database.getConnection();
-        Customer customer = null;
-        String sqlQuery = "SELECT * FROM Customer WHERE CustomerId = ?";
-        PreparedStatement prepStatement = conn.prepareStatement(sqlQuery);
-        prepStatement.setInt(1, id);
-        ResultSet resultSet = prepStatement.executeQuery();
-        if (resultSet.next()) {
-            int customerId = resultSet.getInt("CustomerId");
-            String firstName = resultSet.getString("FirstName");
-            String lastName = resultSet.getString("LastName");
-            String company = resultSet.getString("Company");
-            String address = resultSet.getString("Address");
-            String city = resultSet.getString("City");
-            String state = resultSet.getString("State");
-            String country = resultSet.getString("Country");
-            String postalCode = resultSet.getString("PostalCode");
-            String phone = resultSet.getString("Phone");
-            String fax = resultSet.getString("Fax");
-            String email = resultSet.getString("Email");
-            int supportRepId = resultSet.getInt("SupportRepId");
+    public Customer get(int customerId) throws SQLException {
+        try (Connection conn = Database.getConnection();
+             PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM Customer WHERE CustomerId = ?")) {
 
-            customer = new Customer(customerId, firstName, lastName, company, address, city, state, country, postalCode, phone, fax, email, supportRepId);
+            prepStatement.setInt(1, customerId);
+            try (ResultSet resultSet = prepStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return extractCustomerFromResultSet(resultSet);
+                }
+            }
         }
-
-        Database.closePreparedStatement(prepStatement);
-        Database.closeConnection(conn);
-
-        return customer;
+        return null; // No customer with given customerId found
     }
 
     // CRUD - Retrieve all
@@ -61,33 +44,15 @@ public class CustomerDAOImplementation implements CustomerDAO {
      */
     @Override
     public List<Customer> getAll() throws SQLException {
-        Connection conn = Database.getConnection();
         List<Customer> customers = new ArrayList<>();
-        String sqlQuery = "SELECT * FROM Customer";
-        PreparedStatement prepStatement = conn.prepareStatement(sqlQuery);
-        ResultSet resultSet = prepStatement.executeQuery();
-        while (resultSet.next()) {
-            int customerId = resultSet.getInt("CustomerId");
-            String firstName = resultSet.getString("FirstName");
-            String lastName = resultSet.getString("LastName");
-            String company = resultSet.getString("Company");
-            String address = resultSet.getString("Address");
-            String city = resultSet.getString("City");
-            String state = resultSet.getString("State");
-            String country = resultSet.getString("Country");
-            String postalCode = resultSet.getString("PostalCode");
-            String phone = resultSet.getString("Phone");
-            String fax = resultSet.getString("Fax");
-            String email = resultSet.getString("Email");
-            int supportRepId = resultSet.getInt("SupportRepId");
+        try (Connection conn = Database.getConnection();
+             PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM Customer");
+             ResultSet resultSet = prepStatement.executeQuery()) {
 
-            Customer customer = new Customer(customerId, firstName, lastName, company, address, city, state, country, postalCode, phone, fax, email, supportRepId);
-            customers.add(customer);
+            while (resultSet.next()) {
+                    customers.add(extractCustomerFromResultSet(resultSet));
+            }
         }
-
-        Database.closePreparedStatement(prepStatement);
-        Database.closeConnection(conn);
-
         return customers;
     }
 
@@ -101,30 +66,27 @@ public class CustomerDAOImplementation implements CustomerDAO {
      */
     @Override
     public int insert(Customer customer) throws SQLException {
-        Connection conn = Database.getConnection();
         String sqlQuery = "INSERT INTO Customer (CustomerId, FirstName, LastName, Company, Address, City, State, Country, PostalCode, Phone, Fax, Email, SupportRepId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        PreparedStatement prepStatement = conn.prepareStatement(sqlQuery);
+        try (Connection conn = Database.getConnection();
+        PreparedStatement prepStatement = conn.prepareStatement(sqlQuery)) {
+            prepStatement.setInt(1, customer.getCustomerId());
+            prepStatement.setString(2, customer.getFirstName());
+            prepStatement.setString(3, customer.getLastName());
+            prepStatement.setString(4, customer.getCompany());
+            prepStatement.setString(5, customer.getAddress());
+            prepStatement.setString(6, customer.getCity());
+            prepStatement.setString(7, customer.getState());
+            prepStatement.setString(8, customer.getCountry());
+            prepStatement.setString(9, customer.getPostalCode());
+            prepStatement.setString(10, customer.getPhone());
+            prepStatement.setString(11, customer.getFax());
+            prepStatement.setString(12, customer.getEmail());
+            prepStatement.setInt(13, customer.getSupportRepId());
 
-        prepStatement.setInt(1, customer.getCustomerId());
-        prepStatement.setString(2, customer.getFirstName());
-        prepStatement.setString(3, customer.getLastName());
-        prepStatement.setString(4, customer.getCompany());
-        prepStatement.setString(5, customer.getAddress());
-        prepStatement.setString(6, customer.getCity());
-        prepStatement.setString(7, customer.getState());
-        prepStatement.setString(8, customer.getCountry());
-        prepStatement.setString(9, customer.getPostalCode());
-        prepStatement.setString(10, customer.getPhone());
-        prepStatement.setString(11, customer.getFax());
-        prepStatement.setString(12, customer.getEmail());
-        prepStatement.setInt(13, customer.getSupportRepId());
+            int result = prepStatement.executeUpdate();
 
-        int result = prepStatement.executeUpdate();
-
-        Database.closePreparedStatement(prepStatement);
-        Database.closeConnection(conn);
-
-        return result;
+            return result;
+        }
     }
 
     // CRUD - Update
@@ -137,30 +99,27 @@ public class CustomerDAOImplementation implements CustomerDAO {
      */
     @Override
     public int update(Customer customer) throws SQLException {
-        Connection conn = Database.getConnection();
         String sqlQuery = "UPDATE Customer SET FirstName = ?, LastName = ?, Company = ?, Address = ?, City = ?, State = ?, Country = ?, PostalCode = ?, Phone = ?, Fax = ?, Email = ?, SupportRepId = ? WHERE CustomerId = ?";
-        PreparedStatement prepStatement = conn.prepareStatement(sqlQuery);
+        try (Connection conn = Database.getConnection();
+        PreparedStatement prepStatement = conn.prepareStatement(sqlQuery)) {
+            prepStatement.setString(1, customer.getFirstName());
+            prepStatement.setString(2, customer.getLastName());
+            prepStatement.setString(3, customer.getCompany());
+            prepStatement.setString(4, customer.getAddress());
+            prepStatement.setString(5, customer.getCity());
+            prepStatement.setString(6, customer.getState());
+            prepStatement.setString(7, customer.getCountry());
+            prepStatement.setString(8, customer.getPostalCode());
+            prepStatement.setString(9, customer.getPhone());
+            prepStatement.setString(10, customer.getFax());
+            prepStatement.setString(11, customer.getEmail());
+            prepStatement.setInt(12, customer.getSupportRepId());
+            prepStatement.setInt(13, customer.getCustomerId());
 
-        prepStatement.setString(1, customer.getFirstName());
-        prepStatement.setString(2, customer.getLastName());
-        prepStatement.setString(3, customer.getCompany());
-        prepStatement.setString(4, customer.getAddress());
-        prepStatement.setString(5, customer.getCity());
-        prepStatement.setString(6, customer.getState());
-        prepStatement.setString(7, customer.getCountry());
-        prepStatement.setString(8, customer.getPostalCode());
-        prepStatement.setString(9, customer.getPhone());
-        prepStatement.setString(10, customer.getFax());
-        prepStatement.setString(11, customer.getEmail());
-        prepStatement.setInt(12, customer.getSupportRepId());
-        prepStatement.setInt(13, customer.getCustomerId());
+            int result = prepStatement.executeUpdate();
 
-        int result = prepStatement.executeUpdate();
-
-        Database.closePreparedStatement(prepStatement);
-        Database.closeConnection(conn);
-
-        return result;
+            return result;
+        }
     }
 
     // CRUD - Delete
@@ -175,8 +134,7 @@ public class CustomerDAOImplementation implements CustomerDAO {
     public int delete(Customer customer) {
         try {
             Connection conn = Database.getConnection();
-            String sqlQuery = "DELETE FROM Customer WHERE CustomerId = ?";
-            PreparedStatement prepStatement = conn.prepareStatement(sqlQuery);
+            PreparedStatement prepStatement = conn.prepareStatement("DELETE FROM Customer WHERE CustomerId = ?");
             prepStatement.setInt(1, customer.getCustomerId());
             int result = prepStatement.executeUpdate();
 
@@ -187,6 +145,32 @@ public class CustomerDAOImplementation implements CustomerDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    // Helper function to extract a Customer object from a given ResultSet object.
+    /**
+     * Extracts a customer object from the given result set.
+     *
+     * @param resultSet The result set containing the customer data.
+     * @return The customer object extracted from the result set.
+     * @throws SQLException If an SQL exception occurs while accessing the result set.
+     */
+    private Customer extractCustomerFromResultSet(ResultSet resultSet) throws SQLException {
+        Customer customer = new Customer(
+                resultSet.getInt("CustomerId"),
+                resultSet.getString("FirstName"),
+                resultSet.getString("LastName"),
+                resultSet.getString("Company"),
+                resultSet.getString("Address"),
+                resultSet.getString("City"),
+                resultSet.getString("State"),
+                resultSet.getString("Country"),
+                resultSet.getString("PostalCode"),
+                resultSet.getString("Phone"),
+                resultSet.getString("Fax"),
+                resultSet.getString("Email"),
+                resultSet.getInt("SupportRepId"));
+        return customer;
     }
 
     // CRUD - Create or update
