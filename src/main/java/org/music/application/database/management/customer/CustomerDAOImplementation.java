@@ -83,9 +83,7 @@ public class CustomerDAOImplementation implements CustomerDAO {
             prepStatement.setString(12, customer.getEmail());
             prepStatement.setInt(13, customer.getSupportRepId());
 
-            int result = prepStatement.executeUpdate();
-
-            return result;
+            return prepStatement.executeUpdate();
         }
     }
 
@@ -116,9 +114,7 @@ public class CustomerDAOImplementation implements CustomerDAO {
             prepStatement.setInt(12, customer.getSupportRepId());
             prepStatement.setInt(13, customer.getCustomerId());
 
-            int result = prepStatement.executeUpdate();
-
-            return result;
+            return prepStatement.executeUpdate();
         }
     }
 
@@ -156,7 +152,7 @@ public class CustomerDAOImplementation implements CustomerDAO {
      * @throws SQLException If an SQL exception occurs while accessing the result set.
      */
     private Customer extractCustomerFromResultSet(ResultSet resultSet) throws SQLException {
-        Customer customer = new Customer(
+        return new Customer(
                 resultSet.getInt("CustomerId"),
                 resultSet.getString("FirstName"),
                 resultSet.getString("LastName"),
@@ -169,8 +165,8 @@ public class CustomerDAOImplementation implements CustomerDAO {
                 resultSet.getString("Phone"),
                 resultSet.getString("Fax"),
                 resultSet.getString("Email"),
-                resultSet.getInt("SupportRepId"));
-        return customer;
+                resultSet.getInt("SupportRepId")
+        );
     }
 
     // CRUD - Create or update
