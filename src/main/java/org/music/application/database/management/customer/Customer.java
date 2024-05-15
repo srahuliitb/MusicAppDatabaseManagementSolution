@@ -4,9 +4,10 @@
  */
 package org.music.application.database.management.customer;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Customer {
+public class Customer implements Serializable {
 
     private final int customerId;  // Unique identifier for the customer
     private String firstName;  // First name of the customer
