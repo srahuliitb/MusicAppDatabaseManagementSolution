@@ -3,21 +3,25 @@ package org.music.application.database.management.customer;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 public class Main {
+    private static final Logger logger = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) {
         try (Connection conn = Database.getConnection()) {
-            System.out.println("Database connection successful!\nDatabase Name: " + conn.getCatalog());
+//            System.out.println("Database connection successful!\nDatabase Name: " + conn.getCatalog());
+            logger.info(String.format("Database connection successful!\nDatabase Name: %s", conn.getCatalog()));
 
             CustomerDAO customerDAO = new CustomerDAOImplementation();
 
             Customer customer = customerDAO.get(5);
-            System.out.println(customer);
+            logger.info(customer.toString());
 
             List<Customer> customers = customerDAO.getAll();
             for (Customer c : customers) {
-                System.out.println(c);
+                logger.info(c.toString());
             }
 
 //            Customer customer1 = new Customer(60, "Songyun", "Tan",
